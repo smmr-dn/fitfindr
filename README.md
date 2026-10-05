@@ -59,24 +59,25 @@
 
 ### `search_listings`
 
-- **What it does:**
-- **Inputs:** <!-- name and type each: `max_price` (float), not "a price" -->
-- **Returns:**
-- **When it has nothing:**
+- **What it does:** Search the listings data for items matching a description, and optionally a size and a price ceiling.
+- **Inputs:** a description of each listing, a max price in dollars, and a size string to filter by, or None to skip size filtering. Match case-insensitively — "M" should match "S/M".
+- **Returns:** a list of matching listing dicts, best match first.
+- **When it has nothing:** returns an empty list when nothing matches — an empty list, not None, and not an exception.
 
 ### `suggest_outfit`
 
-- **What it does:**
-- **Inputs:**
-- **Returns:**
-- **When it has nothing:**
+- **What it does:** given a thrifted item and the user's wardrobe, this function suggest one or two outfits.
+- **Inputs:** a listing dict — the item the user is considering, and a wardrobe dict with an 'items' key holding a list of items.
+- **Returns:** a non-empty string with outfit suggestions. With an empty wardrobe, return general styling advice rather than raising or returning "".
+- **When it has nothing:** a string with general styling advice.
 
 ### `create_fit_card`
 
-- **What it does:**
-- **Inputs:**
-- **Returns:**
-- **When it has nothing:**
+- **What it does:** writes a short caption someone would actually post about the find.
+- **Inputs:** the outfit suggestion string from suggest_outfit(), a listing dict for the item.
+- **Returns:** a two-to-four sentence caption.
+- **When it has nothing:** if `outfit` is empty or whitespace, return a descriptive message rather than raising.
+
 
 ---
 
