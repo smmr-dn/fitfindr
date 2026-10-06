@@ -24,11 +24,8 @@ data earns credit; *"80% seemed reasonable"* does not.
 Given a query that matches at least one listing, the agent completes all three
 tool calls and returns a fit card — in at least 4 of 5 tries.
 
-**Why this target:**
-<!-- Why 4 of 5 and not 5 of 5? Something about your search, probably —
-     "my search is a plain keyword match and some phrasings will miss" is a
-     real answer. -->
-
+**Why this target:** The query is in plain language and some phrasings might miss during the parsing and passing down.
+ 
 ---
 
 ## 2. An impossible query stops before the second tool
@@ -36,66 +33,35 @@ tool calls and returns a fit card — in at least 4 of 5 tries.
 Given a query that matches no listings, the agent stops before calling
 `suggest_outfit` and returns a message naming what to change — 5 of 5 tries.
 
-**Why this target:**
-<!-- Why is 5 of 5 reasonable here when criterion 1 isn't? What's different
-     about this path? -->
+**Why this target:** The agent should not create hallucination and go through all tools with broken states.
 
 ---
 
-## 3. Something about state
+## 3. An item reaching each tool is identical to the one selected
 
-<!-- YOU WRITE THIS ONE.
+In 5 of 5 completed runs, the dict passed into `suggest_outfit` and the dict passed into `create_fit_card` each equal session["selected_item"] field for field, compared against a deep copy taken before the call. `selected_item` equals `search_results[0]`.
 
-     How would you know that the item your search found is the same item the
-     next tool received? Name something countable or observable.
-
-     This is the criterion people find hardest, because state failure doesn't
-     look like state failure — it looks like a tool problem. Something that
-     compares session["selected_item"] against what actually reached
-     suggest_outfit is the shape you're after. -->
-
-
-
-**Why this target:**
-
+**Why this target:**: `selected_item` is the only thing linking three tools, and a wrong item looks like a bad outfit rather than a state bug. 5 of 5 because no model is involved in picking or passing the item, so one miss is a real bug.
 
 
 ---
 
-## 4. Something about the fit card
+## 4. A fit card caption should satisfy all mentioned information provided in the query
 
-<!-- YOU WRITE THIS ONE.
-
-     The fit card calls a model, so the same input can produce different words
-     each time. That's not a bug — it's the nature of the tool. So what would
-     make it acceptable?
-
-     Think about what you'd actually be unhappy to see. A caption that never
-     mentions the price? Two different items producing the same opening
-     sentence? A card longer than a caption anyone would post? Any of those can
-     be turned into a number. -->
+In 5 of 5 completed runs, the caption string returned by the fit card should be between two to four sentences only. The caption should state the item with details and its price and platform once each, if any of these fields is non-empty.
 
 
-
-**Why this target:**
+**Why this target:** Since the string returned by the fit card can differ from the same input, the information contained in the caption should be consistent even though the format may look different every run.  
 
 
 
 ---
 
-## 5. Your choice
+## 5. An empty wardrobe does not stop the run
 
-<!-- YOU WRITE THIS ONE TOO.
+Given a query that matches at least one listing and `get_empty_wardrobe()`, in 5 of 5 runs: no exception is raised, `session["error"]` is `None`, `session["outfit_suggestion"]` is a non-empty string of general styling advice, and `session["fit_card"]` is still 2 to 4 sentences. The suggestion does not refer to items the user owns (e.g. "your black jeans").
 
-     Pick something you actually care about getting right. Speed, the empty
-     wardrobe path, what happens when the model can't be reached, whether the
-     search respects a price ceiling — anything, as long as it names a number
-     or an observable outcome. -->
-
-
-
-**Why this target:**
-
+**Why this target:** Only `suggest_outfit` reads the wardrobe, and `create_fit_card` depends on its output, so those two are where an empty wardrobe can break the run. The no-raise and non-empty outcomes are deterministic contract points, so 5 of 5 is reasonable. The model only varies in wording, and the no-invented-items check is there because with nothing to draw on a model may make up a wardrobe.
 
 
 ---
