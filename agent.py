@@ -66,8 +66,6 @@ def run_agent(query: str, wardrobe: dict) -> dict:
     ─────────────────────────────────────────────────────────────────────────
     TODO — build this, following the branch rule you wrote in Milestone 2.
 
-      1. Start a session with new_session().
-
       2. Count the times round the loop, and call trace.check_iterations(count)
          on each one before you go again. It raises when the count passes
          MAX_ITERATIONS in config.py — see trace.py.
@@ -105,8 +103,10 @@ def run_agent(query: str, wardrobe: dict) -> dict:
       • A handler for ModelUnavailable, so a bad key produces a message rather
         than a stack trace. The import is already at the top of this file.
     """
-    session = new_session(query, wardrobe)
 
+    # 1. Start a session with new_session().
+    session = new_session(query, wardrobe)
+    
     # TODO: delete these two lines and build the loop.
     session["error"] = "The planning loop isn't built yet — see the TODO in agent.py."
     return session

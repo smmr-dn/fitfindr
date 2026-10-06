@@ -94,13 +94,13 @@
      The grader checks your code against what you claim here, so the file and
      function have to be real. -->
 
-**Branch rule:**
+**Branch rule:** If `search_listings` returns an empty list, put a message in the session and stop. Otherwise take the first result and go to `suggest_outfit`.
 
 **Where it lives:** `agent.py::run_agent`
 
-**How the query is parsed:** <!-- regex, string splitting, or asking the model — say which -->
+**How the query is parsed:** use regex to parse the query into `description`, `max_price`, and `size` 
 
-**What moves through the session:** <!-- which fields, in what order -->
+**What moves through the session:** `query` and `wardrobe` go in at the start → parsed (description/size/max_price) → `search_results` → `selected_item` (first result; if empty, error is set and the run stops) → `outfit_suggestion` → `fit_card`
 
 ---
 
