@@ -98,7 +98,7 @@
 
 **Where it lives:** `agent.py::run_agent`
 
-**How the query is parsed:** use regex to parse the query into `description`, `max_price`, and `size` 
+**How the query is parsed:** use the model to parse the query into `description`, `max_price`, and `size` 
 
 **What moves through the session:** `query` and `wardrobe` go in at the start → parsed (description/size/max_price) → `search_results` → `selected_item` (first result; if empty, error is set and the run stops) → `outfit_suggestion` → `fit_card`
 

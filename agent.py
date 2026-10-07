@@ -16,7 +16,7 @@ Build and test your three tools in `tools.py` first. Then come here.
 import config
 import trace
 from tools import search_listings, suggest_outfit, create_fit_card
-from generate import ModelUnavailable
+from generate import generate
 
 
 # ── session state ─────────────────────────────────────────────────────────────
@@ -106,10 +106,33 @@ def run_agent(query: str, wardrobe: dict) -> dict:
 
     # 1. Start a session with new_session().
     session = new_session(query, wardrobe)
-    
-    # TODO: delete these two lines and build the loop.
-    session["error"] = "The planning loop isn't built yet — see the TODO in agent.py."
-    return session
+
+    count = 0
+    while True:
+        count += 1
+        trace.check_iterations(count)
+
+        prompt = f"Parse the query {query} into 3 parts: fit description, max price and size, each is split with a comma."
+        parsed = generate(prompt).split(",")
+        session["parsed"] = {"description": parsed[0], "max_price": parsed[1], "size": parsed[2]}
+        p = session["parsed"]
+
+        session["search_results"] = search_listings(p["description"], p["size"], float(p["max_price"]))
+
+        if not session["search_results"]:
+            session["error"] = "No result was found. Please try again with a clearer query."
+            return session
+
+        session["selected_item"] = session["search_results"][0]
+
+        session["outfit_suggestion"] = suggest_outfit(
+        session["selected_item"], session["wardrobe"])
+        
+        session["fit_card"] = create_fit_card(
+            session["outfit_suggestion"], session["selected_item"]
+        )
+         
+        return session
 
 
 # ── running it directly ───────────────────────────────────────────────────────
