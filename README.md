@@ -41,6 +41,7 @@
 
 <!-- Three or four sentences: what a user asks for, and what they get back. -->
 
+A user describes a thrifted piece in plain language, such as "vintage graphic tee under $30, size M", and FitFindr searches a set of secondhand listings for the best match within that size and price. It then suggests one or two outfits that pair the find with items from the user's wardrobe, or general styling advice if the wardrobe is empty. Finally it writes a short, postable caption (a "fit card") about the find. If nothing matches, it stops and tells the user what to change instead of making up an outfit.
 
 
 ---
@@ -164,15 +165,15 @@ Nothing beats the effortless combo of classic denim and fresh white sneakers for
 
 **Moment 1**
 
-- *What I asked for:*
-- *What came back:*
-- *What I changed:*
+- *What I asked for:* I wrote my five acceptance criteria in `criteria.md` and asked Claude to stress test them one at a time.
+- *What came back:* Claude found specific gaps. Criterion 3 ("the state that goes through tools should remain the same") had no number and was wrong read literally, since the session is meant to change as it fills in. My criterion 4 bundled length with query-matching, and it tested the search tool rather than the caption. "Not too lengthy" couldn't be measured, and "once each" for price and platform was stricter than I needed. My "why" under criterion 3 said tools should receive no parameters, which is false.
+- *What I changed:* I rewrote criterion 3 as "an item reaching each tool is identical to the one selected", checked in 5 of 5 completed runs against a deep copy of `selected_item`, with `selected_item` equal to `search_results[0]`. I replaced criterion 4's length wording with 2 to 4 sentences and named the item, price and platform as things the caption must state. I kept Claude's draft of criterion 5 (an empty wardrobe doesn't stop the run), which turns "break" into observable outcomes.
 
 **Moment 2**
 
-- *What I asked for:*
-- *What came back:*
-- *What I changed:*
+- *What I asked for:* I asked Claude whether anything in the project already scored listings by keyword overlap for `search_listings`, and then how to handle decimals when splitting the description into words.
+- *What came back:* Nothing existing does it, so I wrote the scoring myself. Claude pointed out that my first filter would crash with a `TypeError` whenever `size` or `max_price` was `None`, which my own docstring says means "skip that filter". It also noted that `l["size"] in size` was backwards and was the substring trap the docstring warns about. On decimals, it showed that splitting on `\w+` turns "9.5" into "9" and "5".
+- *What I changed:* I rewrote the filter with `is not None` guards, and I now test `size not in listing["size"]` the right way round. I haven't changed the size match to compare whole sizes, so "l" can still match "xl" and I need to fix that.
 
 <!-- ═══════════════════════ UNIT 4 — THE TEST ═══════════════════════
 
